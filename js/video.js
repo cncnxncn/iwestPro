@@ -1,4 +1,5 @@
 let player;
+let defaultSrc = './video/';
 
 var video = (function() {
   var classNm = '';
@@ -13,6 +14,9 @@ var video = (function() {
     },
     getCurrentIndex: () => {
       return currentIndex;
+    },
+    getCurrentIndexStr: () => {
+      return `${currentIndex > 9 ? '':'0'}${currentIndex}`;
     },
     setCurrentIndex: (_index) => {
       currentIndex = _index;
@@ -46,16 +50,17 @@ function loadVideo(_sourceNm, lastIndex) {
   videojs('player', {
     sources: [
       {
-        src: `./video/${_sourceNm}.mp4`,
+        src: `${defaultSrc}${_sourceNm}.mp4`,
         type: "video/mp4"
       },
     ],
     controls: true,
     muted: true,
+    autoplay: true,
     controlBar: {
       playToggle: false,
       pictureInPictureToggle: false,
-    }
+    },
   })
 
   videojs.getPlayer("player").ready(function() {
@@ -76,27 +81,41 @@ function addNavButton() {
   let controlBar = document.getElementsByClassName('vjs-control-bar')[0];
   let insertBeforeNode = document.getElementsByClassName('vjs-fullscreen-control')[0];
 
-  let defaultStyle = 'width: 25px; margin-top: 2px';
+  let defaultStyle = 'width: 25px; margin-top: 2px; cursor: pointer;';
+
 
   playBackBtnImg.setAttribute('src','../static/image/video-dbback-btn.png');
-  playBackBtnImg.style = defaultStyle
+  playBackBtnImg.style = defaultStyle;
+  playBackBtn.addEventListener('click', function() {
+    var jumpTime = 15;
+    var newTime,
+        curTime = player.currentTime();
+    if(curTime >= jumpTime) {
+        newTime = curTime - jumpTime;
+    } else {
+        newTime = 0;
+    }
+    player.currentTime(newTime);
+  })
+
   playBackBtn.append(playBackBtnImg);
   controlBar.insertBefore(playBackBtn, insertBeforeNode);
 
+  backVideoBtnImg.setAttribute('src','../static/image/video-before-btn.png');
+  backVideoBtn.addEventListener('click', onClickBeforeVideoBtn);
+  backVideoBtn.id = 'back-video';
+  backVideoBtn.style = hasBeforeVideo() ?'':'display:none'
+  backVideoBtn.append(backVideoBtnImg);
+  controlBar.insertBefore(backVideoBtn, insertBeforeNode);
+  backVideoBtnImg.style = defaultStyle;
 
-  if(hasBeforeVideo()) {
-    backVideoBtnImg.setAttribute('src','../static/image/video-before-btn.png');
-    backVideoBtnImg.style = defaultStyle;
-    backVideoBtn.append(nextVideoBtnImg);
-    controlBar.insertBefore(backVideoBtn, insertBeforeNode);
-  }
-
-  if(hasNextVideo()) {
-    nextVideoBtnImg.setAttribute('src','../static/image/video-next-btn.png');
-    nextVideoBtnImg.style = defaultStyle
-    nextVideoBtn.append(nextVideoBtnImg);
-    controlBar.insertBefore(nextVideoBtn, insertBeforeNode);
-  }
+  nextVideoBtnImg.setAttribute('src','../static/image/video-next-btn.png');
+  nextVideoBtn.addEventListener('click', onClickNextVideoBtn);
+  nextVideoBtn.id = 'next-video';
+  nextVideoBtn.style = hasNextVideo()?'':'display:none'
+  nextVideoBtn.append(nextVideoBtnImg);
+  controlBar.insertBefore(nextVideoBtn, insertBeforeNode);
+  nextVideoBtnImg.style = defaultStyle;
 }
 
 function hasNextVideo() {
@@ -105,4 +124,26 @@ function hasNextVideo() {
 
 function hasBeforeVideo() {
   return video.getCurrentIndex() > 1;
+}
+
+function getVideoSource() {
+  return `${defaultSrc}${video.getClassName()}_${video.getCurrentIndexStr()}.mp4`;
+}
+
+function updateNavButton() {
+  document.getElementById('back-video').style.display = hasBeforeVideo() ? 'block':'none';
+  document.getElementById('next-video').style.display = hasNextVideo() ? 'block':'none';
+}
+
+// video ControlBar Event
+function onClickNextVideoBtn() {
+  video.setCurrentIndex(video.getCurrentIndex() + 1);
+  player.src(getVideoSource());
+  updateNavButton()
+}
+
+function onClickBeforeVideoBtn() {
+  video.setCurrentIndex(video.getCurrentIndex() - 1);
+  player.src(getVideoSource());
+  updateNavButton()
 }
