@@ -84,7 +84,7 @@ function addNavButton() {
   let defaultStyle = 'width: 25px; margin-top: 2px; cursor: pointer;';
 
 
-  playBackBtnImg.setAttribute('src','../static/image/video-dbback-btn.png');
+  playBackBtnImg.setAttribute('src','../../static/image/video-dbback-btn.png');
   playBackBtnImg.style = defaultStyle;
   playBackBtn.addEventListener('click', function() {
     var jumpTime = 15;
@@ -101,7 +101,7 @@ function addNavButton() {
   playBackBtn.append(playBackBtnImg);
   controlBar.insertBefore(playBackBtn, insertBeforeNode);
 
-  backVideoBtnImg.setAttribute('src','../static/image/video-before-btn.png');
+  backVideoBtnImg.setAttribute('src','../../static/image/video-before-btn.png');
   backVideoBtn.addEventListener('click', onClickBeforeVideoBtn);
   backVideoBtn.id = 'back-video';
   backVideoBtn.style = hasBeforeVideo() ?'':'display:none'
@@ -109,7 +109,7 @@ function addNavButton() {
   controlBar.insertBefore(backVideoBtn, insertBeforeNode);
   backVideoBtnImg.style = defaultStyle;
 
-  nextVideoBtnImg.setAttribute('src','../static/image/video-next-btn.png');
+  nextVideoBtnImg.setAttribute('src','../../static/image/video-next-btn.png');
   nextVideoBtn.addEventListener('click', onClickNextVideoBtn);
   nextVideoBtn.id = 'next-video';
   nextVideoBtn.style = hasNextVideo()?'':'display:none'
