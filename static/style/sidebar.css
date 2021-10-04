@@ -129,3 +129,49 @@ em, p, li {
 .toggle.on .arrow {
   transform: rotate(0deg);
 }
+
+/* video js custom css */
+.vjs-button>.vjs-icon-placeholder:before {
+  font-size: 3em;
+}
+
+.video-js .vjs-control-bar {
+  height: 5em;
+}
+
+.video-js .vjs-time-control {
+  font-size: 1.7em;
+}
+
+.vjs-volume-bar.vjs-slider-horizontal {
+  height: .7em;
+}
+
+.video-js .vjs-progress-control {
+  pointer-events: none;
+}
+
+.vjs-volume-horizontal {
+  margin-top: 5px !important;
+}
+
+.vjs-playback-rate .vjs-menu {
+  width: 5em;
+  left: -5px;
+}
+
+.vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+  bottom: 2.2em;
+}
+
+.vjs-menu li {
+  font-size: 1.5em;
+}
+
+.vjs-playback-rate .vjs-playback-rate-value {
+  font-size: 1.8  em;
+}
+
+.vjs-playback-rate .vjs-playback-rate-value, .vjs-playback-rate>.vjs-menu-button {
+  top: 10px;
+}
