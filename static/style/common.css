@@ -175,3 +175,29 @@ em, p, li {
 .vjs-playback-rate .vjs-playback-rate-value, .vjs-playback-rate>.vjs-menu-button {
   top: 10px;
 }
+
+.video-js .vjs-load-progress div {
+  background: #FFF;
+}
+
+.video-js .vjs-play-progress {
+  background-color: #6c9fce;
+}
+
+.video-js .vjs-play-progress:before {
+  content: "\25AE";
+}
+
+.video-js .vjs-play-progress:before {
+  font-size: 1.9em;
+  position: absolute;
+  right: -0.5em;
+  top: -0.533333em;
+  z-index: 1;
+  color: #6c9fce;
+}
+
+.video-js .vjs-control-bar {
+  height: 5em;
+  background-color: #212121;
+}
