@@ -1,78 +1,51 @@
 let player;
+
+// 비디오 폴더 경로
 const defaultSrc = './video/';
 
-// 비디오 관련 데이터 관리
-var video = (function() {
-  var classNm = '';
-  var lastIndex = -1;
-  var currentIndex = -1;
-  
-  var $controlBar, $insertBeforeNode;
+// 이미지 폴더 경로
+const defaultImageSrc = '../../static/image/';
 
-  return {
-    setLastIndex: (_index) => {
-      lastIndex = _index;
-    },
-    getLastIndex: () => {
-      return lastIndex;
-    },
-    getCurrentIndex: () => {
-      return currentIndex;
-    },
-    getCurrentIndexStr: () => {
-      return `${currentIndex > 9 ? '':'0'}${currentIndex}`;
-    },
-    setCurrentIndex: (_index) => {
-      currentIndex = _index;
-    },
-    setClassName: (_classNm) => {
-      classNm = _classNm;
-    },
-    getClassName: () => {
-      return classNm;
-    },
-    getControlBar: () => {
-      if(typeof $controlBar == 'undefined') 
-        $controlBar = document.getElementsByClassName('vjs-control-bar')[0];
-      return $controlBar;
-    },
-    getInsertBeforeNode: () => {
-      if(typeof $insertBeforeNode == 'undefined')
-        $insertBeforeNode = document.getElementsByClassName('vjs-fullscreen-control')[0];
-      return $insertBeforeNode;
-    }
-  }
-})(); 
+// 비디오 다음/이전 버튼 분기점
+const indexBC = [
+  {
+    start: 1,
+    end: 21,
+  },
+];
+
+let config;
+
+const query = location.search.replace(/\?/, '').split('&').reduce((acc, obj , i) => {
+  const [key, value] = obj.split('=');
+  acc[key] = value;
+  return acc;
+}, {});
+
+const _class = query.class > 9 ? query.class : `0${Number(query.class)}`;
+const index = query.index > 9 ? query.index : `0${Number(query.index)}`;
 
 /**
  * 
  * @param {string} _sourceNm
  * @param {number} lastIndex
  */
-function loadVideo(_sourceNm, lastIndex) {
-  // 영상 파일명 분기처리
-  let bc = _sourceNm.lastIndexOf('_');
-  // 인덱스 제외한 파일명
-  let classNm = _sourceNm.substr(0, bc);
-  // 영상 인덱스
-  let videoIndex = _sourceNm.substr(bc + 1);
+function loadVideo() {
 
-  console.log('classNm : ' ,  classNm, '\nvideoindex : ' ,  videoIndex);
+  config = indexBC.find(c => c.start <= index && c.end >= index);
 
-  video.setCurrentIndex(Number(videoIndex));
-  video.setLastIndex(lastIndex);
-  video.setClassName(classNm);
+  const source_name = `${_class}_${index}`;
 
   // 비디오 객체 생성
   videojs('player', {
     sources: [
       {
-        src: `${defaultSrc}${_sourceNm}.mp4`,
+        src: `${defaultSrc}${source_name}.mp4`,
         type: "video/mp4"
       },
     ],
     controls: true,
-    muted: false,
+    muted: true,
     autoplay: true,
     controlBar: {
       playToggle: false,
@@ -87,10 +60,10 @@ function loadVideo(_sourceNm, lastIndex) {
 
     this.on("ended", () => {
       const $el = document.getElementById('playToggle-video').getElementsByTagName('img')[0];
-      $el.setAttribute('src', '../../static/image/video-playToggle-btn.png');
+      $el.setAttribute('src', `${defaultImageSrc}video-playToggle-btn.png`);
 
       // 영상이 끝날때 다음 버튼 노출 확인
-      updateNavButton(true);
+      updateNavButton(hasNextVideo());
     });
 
     addNavButton();
@@ -106,7 +79,12 @@ function addNavButton() {
   createVideoBtn('dbback');
 
   let $el = document.getElementsByClassName('vjs-volume-panel')[0];
-  video.getControlBar().insertBefore($el, video.getInsertBeforeNode());
+
+  let $controlBar = document.getElementsByClassName('vjs-control-bar')[0];
+  let $insertBeforeNode = document.getElementsByClassName('vjs-fullscreen-control')[0];
+
+
+  $controlBar.insertBefore($el, $insertBeforeNode);
 }
 
 const displayNone = 'display:none;';
@@ -114,16 +92,16 @@ const defaultStyle = 'width: 25px; margin-top: 12px; cursor: pointer;';
 
 // controller bar에 버튼 추가
 function createVideoBtn(type) {
-  let $insertBeforeNode;
-
   var $template = document.createElement('div'),
     $img = document.createElement('img');
   
   // 컨트롤러 이미지 경로
-  $img.setAttribute('src', `../../static/image/video-${type}-btn.png`);
+  $img.setAttribute('src', `${defaultImageSrc}video-${type}-btn.png`);
 
   $template.id = `${type}-video`;
-  
+
+  let $insertBeforeNode = document.getElementsByClassName('vjs-fullscreen-control')[0];
+
   if(['next','before'].includes(type)) {
     // 다음 / 이전 영상 버튼
     $template.style = (type == 'next' ? displayNone : (hasBeforeVideo() ? '':displayNone));
@@ -133,17 +111,15 @@ function createVideoBtn(type) {
         setCommit();
       }
     });
-    $insertBeforeNode = video.getInsertBeforeNode();
   } else if(type === 'playToggle') {
     // 재생 토글 버튼
-    if(player.paused()) $img.setAttribute('src', '../../static/image/video-playToggle-pause-btn.png');
-    else $img.setAttribute('src', '../../static/image/video-playToggle-btn.png');
+    if(player.paused()) $img.setAttribute('src', `${defaultImageSrc}video-playToggle-pause-btn.png`);
+    else $img.setAttribute('src', `${defaultImageSrc}video-playToggle-btn.png`);
     $template.addEventListener('click' , onClickPlayToggle);
     $insertBeforeNode = document.getElementsByClassName('vjs-progress-control')[0];
   } else {
     // 영상 뒤로가기 버튼
     $template.addEventListener('click', () => onClickPlayBack());
-    $insertBeforeNode = video.getInsertBeforeNode(); // document.getElementsByClassName('vjs-progress-control')[0];
   }
 
   // 버튼별 css 분기처리
@@ -156,23 +132,22 @@ function createVideoBtn(type) {
   }
 
   $template.append($img);
-  video.getControlBar().insertBefore($template, $insertBeforeNode);
+
+  let $controlBar = document.getElementsByClassName('vjs-control-bar')[0]
+
+  $controlBar.insertBefore($template, $insertBeforeNode);
+  
   return $template;
 }
 
 // 다음 영상 여부 확인
 function hasNextVideo() {
-  return video.getCurrentIndex() < video.getLastIndex();
+  return config.end > index;
 }
 
 // 이전 영상 여부 확인
 function hasBeforeVideo() {
-  return video.getCurrentIndex() > 1;
-}
-
-// 영상 파일명 가져오기
-function getVideoSource() {
-  return `${defaultSrc}${video.getClassName()}_${video.getCurrentIndexStr()}.mp4`;
+  return config.start < index;
 }
 
 // 다음 / 이전 영상 버튼 노출 조건에 따라 노출 / 숨김 처리
@@ -183,9 +158,8 @@ function updateNavButton(showNext) {
 
 // video ControlBar Event
 function onClickVideoSourceChange(isNext) {
-  video.setCurrentIndex(video.getCurrentIndex() + (isNext ? 1 : -1));
-  player.src(getVideoSource());
-  updateNavButton(false)
+  let videoIndex = Number(index) + (isNext ? 1 : -1);
+  location.href = location.pathname + `?class=${_class}&index=${videoIndex > 9 ? videoIndex : `0${videoIndex}`}`;
 }
 
 // 영상 뒤로가기
@@ -205,9 +179,9 @@ function onClickPlayToggle() {
   const $el = document.getElementById('playToggle-video').getElementsByTagName('img')[0];
   if(player.paused()) {
     player.play();
-    $el.setAttribute('src', '../../static/image/video-playToggle-pause-btn.png')
+    $el.setAttribute('src', `${defaultImageSrc}video-playToggle-pause-btn.png`)
   } else {
     player.pause();
-    $el.setAttribute('src', '../../static/image/video-playToggle-btn.png')
+    $el.setAttribute('src', `${defaultImageSrc}video-playToggle-btn.png`)
   }
 }
