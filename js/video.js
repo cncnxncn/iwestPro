@@ -22,19 +22,26 @@ const query = location.search.replace(/\?/, '').split('&').reduce((acc, obj , i)
   return acc;
 }, {});
 
-const _class = query.class > 9 ? query.class : `0${Number(query.class)}`;
-const index = query.index > 9 ? query.index : `0${Number(query.index)}`;
+// const _class = query.class > 9 ? query.class : `0${Number(query.class)}`;
+// const index = query.index > 9 ? query.index : `0${Number(query.index)}`;
+
+let _class, index;
 
 /**
  * 
  * @param {string} _sourceNm
  * @param {number} lastIndex
  */
-function loadVideo() {
+function loadVideo(sourceNm) {
 
+  
+  // const source_name = `${_class}_${index}`;
+  
+  const source_name = sourceNm;
+  
+  [_class, index] = sourceNm.split('_');
+  
   config = indexBC.find(c => c.start <= index && c.end >= index);
-
-  const source_name = `${_class}_${index}`;
 
   // 비디오 객체 생성
   videojs('player', {

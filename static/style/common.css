@@ -147,9 +147,11 @@ em, p, li {
   height: .7em;
 }
 
-.video-js .vjs-progress-control {
+
+/* 동영상 재생바 임시 해제 */
+/* .video-js .vjs-progress-control {
   pointer-events: none;
-}
+} */
 
 .vjs-volume-horizontal {
   margin-top: 5px !important;
