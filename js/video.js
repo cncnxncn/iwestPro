@@ -10,7 +10,15 @@ const defaultImageSrc = '../../static/image/';
 const indexBC = [
   {
     start: 1,
-    end: 21,
+    end: 22,
+  },
+  {
+    start: 23,
+    end: 62,
+  },
+  {
+    start: 63,
+    end: 82,
   },
 ];
 
