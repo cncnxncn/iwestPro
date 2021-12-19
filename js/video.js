@@ -174,7 +174,8 @@ function updateNavButton(showNext) {
 // video ControlBar Event
 function onClickVideoSourceChange(isNext) {
   let videoIndex = Number(index) + (isNext ? 1 : -1);
-  location.href = location.pathname + `?class=${_class}&index=${videoIndex > 9 ? videoIndex : `0${videoIndex}`}`;
+  const pathname = location.pathname.substr(0, location.pathname.lastIndexOf('/') + 1);
+  location.href = pathname + `${_class}_${videoIndex > 9 ? videoIndex : `0${videoIndex}`}.html`;
 }
 
 // 영상 뒤로가기
